@@ -305,9 +305,6 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
             $display("\n[T=%0t] STATE=%s -> NEXT=%s | i=%0d j=%0d k=%0d | valid=%0d inside=%0d",
                 $time, state_name(state), state_name(next_state), i, j, k, valid, is_inside);
         end
-        if (valid) begin
-            $display(">>> RESULT: is_inside = %0d <<<", is_inside);
-        end
     end
     // ---------------------------- Next State Logic ----------------------------
     always @(*) begin
