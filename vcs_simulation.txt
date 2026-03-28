@@ -1,0 +1,3 @@
+若使用vcs模擬的以下有幾點需要更改的請注意。
+1.RTL sim使用的指令為vcs -R -full64 -sverilog tb.sv geofence.v +maxdelays +access+r +vcs+fsdbon +fsdb+mda +fsdbfile+geofence.fsdb
+2.合成後gate sim使用的指令為vcs -R -full64 -sverilog tb.sv geofence_syn.v +maxdelays +define+SDF +access+r +vcs+fsdbon +fsdb+mda +fsdbfile+geofence.fsdb -v /home/raid7_2/course/cvsd/CBDK_IC_Contest/CIC/Verilog/tsmc13_neg.v
