@@ -250,12 +250,12 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 i <= 3'd1;
                 j <= 3'd2;
             end else if (state == S_CALC_CROSS) begin
-                vec1[0] <= vertex_vector_x[i];
-                vec1[1] <= vertex_vector_y[i];
-                vec2[0] <= vertex_vector_x[j];
-                vec2[1] <= vertex_vector_y[j];
+                vec1_x <= vertex_vector_x[i];
+                vec1_y <= vertex_vector_y[i];
+                vec2_x <= vertex_vector_x[j];
+                vec2_y <= vertex_vector_y[j];
                 $display("  CROSS input: A=(%0d,%0d), B=(%0d,%0d)",
-                    vec1[0], vec1[1], vec2[0], vec2[1]);
+                    vec1_x, vec1_y, vec2_x, vec2_y);
             end else if (state == S_HARVEST_CROSS) begin
                 sorter_cmp[i][j] <= (cross_result > 0);
                 sorter_cmp[j][i] <= ~(cross_result > 0);
@@ -271,10 +271,10 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
             end else if (state == S_WAIT_SORT) begin 
                 $display("  SORTER busy=%0d done=%0d", sorter_busy, sorter_done);
             end else if (state == S_JUDGE_INIT1) begin
-                vec1[0] <= target_vector_x[sorter_result[5]];
-                vec1[1] <= target_vector_y[sorter_result[5]];
-                vec2[0] <= target_vector_x[sorter_result[0]];
-                vec2[1] <= target_vector_y[sorter_result[0]];
+                vec1_x <= target_vector_x[sorter_result[5]];
+                vec1_y <= target_vector_y[sorter_result[5]];
+                vec2_x <= target_vector_x[sorter_result[0]];
+                vec2_y <= target_vector_y[sorter_result[0]];
                 $display("  SORT RESULT ORDER:");
                 $display("    %0d %0d %0d %0d %0d %0d",
                     sorter_result[0], sorter_result[1], sorter_result[2],
@@ -285,10 +285,10 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 is_inside <= (cross_result != 0);
                 $display("  INIT sign(next)=%0d (cross=%0d)", (cross_result > 0), cross_result);
             end else if (state == S_JUDGE_INSIDE_CALC) begin
-                vec1[0] <= target_vector_x[sorter_result[k]];
-                vec1[1] <= target_vector_y[sorter_result[k]];
-                vec2[0] <= target_vector_x[sorter_result[k + 1]];
-                vec2[1] <= target_vector_y[sorter_result[k + 1]];
+                vec1_x <= target_vector_x[sorter_result[k]];
+                vec1_y <= target_vector_y[sorter_result[k]];
+                vec2_x <= target_vector_x[sorter_result[k + 1]];
+                vec2_y <= target_vector_y[sorter_result[k + 1]];
                 $display("  EDGE k=%0d: A=(%0d,%0d) B=(%0d,%0d)",
                     k,
                     target_vector_x[sorter_result[k]],
