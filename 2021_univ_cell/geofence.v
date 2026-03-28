@@ -171,27 +171,27 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
     
     reg sign;
 
-    function [127:0] state_name;
-        input state_t s;
-        begin
-            case (s)
-                S_IDLE: state_name = "S_IDLE";
-                S_READ_TARGET: state_name = "S_READ_TARGET";
-                S_READ_FIRST_VERTEX: state_name = "S_READ_FIRST_VERTEX";
-                S_READ_VERTEX: state_name = "S_READ_VERTEX";
-                S_CALC_VECTOR: state_name = "S_CALC_VECTOR";
-                S_CALC_CROSS: state_name = "S_CALC_CROSS";
-                S_HARVEST_CROSS: state_name = "S_HARVEST_CROSS";
-                S_START_SORTER: state_name = "S_START_SORTER";
-                S_WAIT_SORT: state_name = "S_WAIT_SORT";
-                S_JUDGE_INIT1: state_name = "S_JUDGE_INIT1";
-                S_JUDGE_INIT2: state_name = "S_JUDGE_INIT2";
-                S_JUDGE_INSIDE_CALC: state_name = "S_JUDGE_INSIDE_CALC";
-                S_JUDGE_INSIDE_HARVEST: state_name = "S_JUDGE_INSIDE_HARVEST";
-                default: state_name = "UNKNOWN";
-            endcase
-        end
-    endfunction
+    // function [127:0] state_name;
+    //     input state_t s;
+    //     begin
+    //         case (s)
+    //             S_IDLE: state_name = "S_IDLE";
+    //             S_READ_TARGET: state_name = "S_READ_TARGET";
+    //             S_READ_FIRST_VERTEX: state_name = "S_READ_FIRST_VERTEX";
+    //             S_READ_VERTEX: state_name = "S_READ_VERTEX";
+    //             S_CALC_VECTOR: state_name = "S_CALC_VECTOR";
+    //             S_CALC_CROSS: state_name = "S_CALC_CROSS";
+    //             S_HARVEST_CROSS: state_name = "S_HARVEST_CROSS";
+    //             S_START_SORTER: state_name = "S_START_SORTER";
+    //             S_WAIT_SORT: state_name = "S_WAIT_SORT";
+    //             S_JUDGE_INIT1: state_name = "S_JUDGE_INIT1";
+    //             S_JUDGE_INIT2: state_name = "S_JUDGE_INIT2";
+    //             S_JUDGE_INSIDE_CALC: state_name = "S_JUDGE_INSIDE_CALC";
+    //             S_JUDGE_INSIDE_HARVEST: state_name = "S_JUDGE_INSIDE_HARVEST";
+    //             default: state_name = "UNKNOWN";
+    //         endcase
+    //     end
+    // endfunction
 
     // ----------------------------- State Register -----------------------------
     always @(posedge clk or posedge reset) begin
@@ -221,12 +221,12 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
             end else if (state == S_READ_TARGET) begin
                 target_x <= X;
                 target_y <= Y;
-                $display("  Read TARGET: (%0d, %0d)", X, Y);
+                // $display("  Read TARGET: (%0d, %0d)", X, Y);
             end else if (state == S_READ_FIRST_VERTEX) begin
                 vertex_x[0] <= X;
                 vertex_y[0] <= Y;
                 i <= 3'd1;
-                $display("  Vertex[0]: (%0d, %0d)", X, Y);
+                // $display("  Vertex[0]: (%0d, %0d)", X, Y);
             end else if (state == S_READ_VERTEX) begin
                 vertex_x[i] <= X;
                 vertex_y[i] <= Y;
@@ -234,10 +234,7 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 vertex_vector_y[i] <= $signed({1'b0, Y}) - $signed({1'b0, vertex_y[0]});
                 i <= i + 3'd1;
                 k <= 3'd0;
-                $display("  Vertex[%0d]: (%0d, %0d) | vec=(%0d,%0d)",
-                    i, X, Y,
-                    $signed({1'b0, X}) - $signed({1'b0, vertex_x[0]}),
-                    $signed({1'b0, Y}) - $signed({1'b0, vertex_y[0]}));
+                // $display("  Vertex[%0d]: (%0d, %0d) | vec=(%0d,%0d)", i, X, Y, $signed({1'b0, X}) - $signed({1'b0, vertex_x[0]}), $signed({1'b0, Y}) - $signed({1'b0, vertex_y[0]}));
             end else if (state == S_CALC_VECTOR) begin
                 target_vector_x[k] <= $signed({1'b0, vertex_x[k]}) - $signed({1'b0, target_x});
                 target_vector_y[k] <= $signed({1'b0, vertex_y[k]}) - $signed({1'b0, target_y});
@@ -249,61 +246,44 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 vec1[1] <= vertex_vector_y[i];
                 vec2[0] <= vertex_vector_x[j];
                 vec2[1] <= vertex_vector_y[j];
-                $display("  CROSS input: A=(%0d,%0d), B=(%0d,%0d)",
-                    vec1[0], vec1[1], vec2[0], vec2[1]);
+                // $display("  CROSS input: A=(%0d,%0d), B=(%0d,%0d)", vec1[0], vec1[1], vec2[0], vec2[1]);
             end else if (state == S_HARVEST_CROSS) begin
                 sorter_cmp[i][j] <= (cross_result > 0);
                 sorter_cmp[j][i] <= ~(cross_result > 0);
                 i <= j == 3'd5 ? i + 3'd1 : i;
                 j <= j == 3'd5 ? i + 3'd2 : j + 1;
-                $display("  CROSS[%0d][%0d] = %0d (sign=%0d)",
-                    i, j, cross_result, (cross_result > 0));
+                // $display("  CROSS[%0d][%0d] = %0d (sign=%0d)", i, j, cross_result, (cross_result > 0));
             end else if (state == S_START_SORTER) begin
-                $display("  SORTER START");
-                for (int t = 0; t < 8; t = t + 1) begin
-                    $display("lane %0d : cmp = %b", t, sorter_cmp[t]);
-                end
+                // $display("  SORTER START");
+                // for (int t = 0; t < 8; t = t + 1) begin $display("lane %0d : cmp = %b", t, sorter_cmp[t]); end
             end else if (state == S_WAIT_SORT) begin 
-                $display("  SORTER busy=%0d done=%0d", sorter_busy, sorter_done);
+                // $display("  SORTER busy=%0d done=%0d", sorter_busy, sorter_done);
             end else if (state == S_JUDGE_INIT1) begin
                 vec1[0] <= target_vector_x[sorter_result[5]];
                 vec1[1] <= target_vector_y[sorter_result[5]];
                 vec2[0] <= target_vector_x[sorter_result[0]];
                 vec2[1] <= target_vector_y[sorter_result[0]];
-                $display("  SORT RESULT ORDER:");
-                $display("    %0d %0d %0d %0d %0d %0d",
-                    sorter_result[0], sorter_result[1], sorter_result[2],
-                    sorter_result[3], sorter_result[4], sorter_result[5]);
+                // $display("  SORT RESULT ORDER:");
+                // $display("    %0d %0d %0d %0d %0d %0d", sorter_result[0], sorter_result[1], sorter_result[2], sorter_result[3], sorter_result[4], sorter_result[5]);
             end else if (state == S_JUDGE_INIT2) begin
                 sign <= (cross_result > 0);
                 k <= 0;
                 is_inside <= (cross_result != 0);
-                $display("  INIT sign(next)=%0d (cross=%0d)", (cross_result > 0), cross_result);
+                // $display("  INIT sign(next)=%0d (cross=%0d)", (cross_result > 0), cross_result);
             end else if (state == S_JUDGE_INSIDE_CALC) begin
                 vec1[0] <= target_vector_x[sorter_result[k]];
                 vec1[1] <= target_vector_y[sorter_result[k]];
                 vec2[0] <= target_vector_x[sorter_result[k + 1]];
                 vec2[1] <= target_vector_y[sorter_result[k + 1]];
-                $display("  EDGE k=%0d: A=(%0d,%0d) B=(%0d,%0d)",
-                    k,
-                    target_vector_x[sorter_result[k]],
-                    target_vector_y[sorter_result[k]],
-                    target_vector_x[sorter_result[k+1]],
-                    target_vector_y[sorter_result[k+1]]);
+                // $display("  EDGE k=%0d: A=(%0d,%0d) B=(%0d,%0d)", k, target_vector_x[sorter_result[k]], target_vector_y[sorter_result[k]], target_vector_x[sorter_result[k+1]], target_vector_y[sorter_result[k+1]]);
             end else if (state == S_JUDGE_INSIDE_HARVEST) begin
                 is_inside <= is_inside && (cross_result != 0) && ((cross_result > 0) == sign);
                 k <= k + 1;
                 valid <= k == 3'd4;
-                $display("  CHECK k=%0d: cross=%0d sign_ok=%0d zero_ok=%0d -> inside=%0d",
-                    k,
-                    cross_result,
-                    ((cross_result > 0) == sign),
-                    (cross_result != 0),
-                    is_inside);
+                // $display("  CHECK k=%0d: cross=%0d sign_ok=%0d zero_ok=%0d -> inside=%0d", k, cross_result, ((cross_result > 0) == sign), (cross_result != 0), is_inside);
             end
             state <= next_state;
-            $display("\n[T=%0t] STATE=%s -> NEXT=%s | i=%0d j=%0d k=%0d | valid=%0d inside=%0d",
-                $time, state_name(state), state_name(next_state), i, j, k, valid, is_inside);
+            // $display("\n[T=%0t] STATE=%s -> NEXT=%s | i=%0d j=%0d k=%0d | valid=%0d inside=%0d", $time, state_name(state), state_name(next_state), i, j, k, valid, is_inside);
         end
     end
     // ---------------------------- Next State Logic ----------------------------
