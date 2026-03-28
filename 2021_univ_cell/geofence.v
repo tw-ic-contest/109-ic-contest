@@ -130,19 +130,19 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
     reg valid;
     reg is_inside;
 
-    parameter S_IDLE = 3'd0, 
-        S_READ_TARGET = 3'd1, 
-        S_READ_FIRST_VERTEX = 3'd2, 
-        S_READ_VERTEX = 3'd3, 
-        S_CALC_VECTOR = 3'd4, 
-        S_CALC_CROSS = 3'd5, 
-        S_HARVEST_CROSS = 3'd6, 
-        S_START_SORTER = 3'd7, 
-        S_WAIT_SORT = 3'd8, 
-        S_JUDGE_INIT1 = 3'd9,
-        S_JUDGE_INIT2 = 3'd10, 
-        S_JUDGE_INSIDE_CALC = 3'd11, 
-        S_JUDGE_INSIDE_HARVEST = 3'd12;
+    parameter S_IDLE = 4'd0, 
+        S_READ_TARGET = 4'd1, 
+        S_READ_FIRST_VERTEX = 4'd2, 
+        S_READ_VERTEX = 4'd3, 
+        S_CALC_VECTOR = 4'd4, 
+        S_CALC_CROSS = 4'd5, 
+        S_HARVEST_CROSS = 4'd6, 
+        S_START_SORTER = 4'd7, 
+        S_WAIT_SORT = 4'd8, 
+        S_JUDGE_INIT1 = 4'd9,
+        S_JUDGE_INIT2 = 4'd10, 
+        S_JUDGE_INSIDE_CALC = 4'd11, 
+        S_JUDGE_INSIDE_HARVEST = 4'd12;
     reg [3:0]state;
     reg [3:0]next_state;
 
