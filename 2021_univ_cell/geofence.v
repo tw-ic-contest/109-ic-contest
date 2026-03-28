@@ -9,17 +9,16 @@ module BitonicSortingNetwork (
     output reg [2:0] result [7:0]
 );
     // start must be a one cycle pulse 
-    typedef enum logic [2:0] {
-        S_IDLE, 
-        S_BI1, 
-        S_BI2, 
-        S_BI2_MG2, 
-        S_BI4, 
-        S_BI4_MG4, 
-        S_BI4_MG2, 
-        S_BI8
-    } state_t;
-    state_t state, next_state;
+    parameter S_IDLE = 3'd0, 
+        S_BI1 = 3'd1, 
+        S_BI2 = 3'd2, 
+        S_BI2_MG2 = 3'd3, 
+        S_BI4 = 3'd4, 
+        S_BI4_MG4 = 3'd5, 
+        S_BI4_MG2 = 3'd6, 
+        S_BI8 = 3'd7;
+    reg [2:0]state;
+    reg [2:0]next_state;
     reg do_bi1; reg do_bi2; reg do_bi4; reg do_reset;
     reg do_bi2_mg2; reg do_bi4_mg4; reg do_bi4_mg2;
 
@@ -131,23 +130,21 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
     reg valid;
     reg is_inside;
 
-    typedef enum logic [3:0] {
-        S_IDLE, 
-        S_READ_TARGET, 
-        S_READ_FIRST_VERTEX, 
-        S_READ_VERTEX, 
-        S_CALC_VECTOR, 
-        S_CALC_CROSS, 
-        S_HARVEST_CROSS, 
-        S_START_SORTER, 
-        S_WAIT_SORT, 
-        S_JUDGE_INIT1,
-        S_JUDGE_INIT2, 
-        S_JUDGE_INSIDE_CALC, 
-        S_JUDGE_INSIDE_HARVEST
-    } state_t;
-    state_t state;
-    state_t next_state;
+    parameter S_IDLE = 3'd0, 
+        S_READ_TARGET = 3'd1, 
+        S_READ_FIRST_VERTEX = 3'd2, 
+        S_READ_VERTEX = 3'd3, 
+        S_CALC_VECTOR = 3'd4, 
+        S_CALC_CROSS = 3'd5, 
+        S_HARVEST_CROSS = 3'd6, 
+        S_START_SORTER = 3'd7, 
+        S_WAIT_SORT = 3'd8, 
+        S_JUDGE_INIT1 = 3'd9,
+        S_JUDGE_INIT2 = 3'd10, 
+        S_JUDGE_INSIDE_CALC = 3'd11, 
+        S_JUDGE_INSIDE_HARVEST = 3'd12;
+    reg [3:0]state;
+    reg [3:0]next_state;
 
     reg [2:0]i; reg [2:0]j; reg [2:0]k;
 
