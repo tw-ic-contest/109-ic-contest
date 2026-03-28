@@ -1,13 +1,29 @@
 module BitonicSortingNetwork (
-    input wire clk, 
-    input wire rst_n, 
-    input wire start, 
-    output reg busy, 
-    output reg done, 
+    input  wire clk,
+    input  wire rst_n,
+    input  wire start,
+    output reg  busy,
+    output reg  done,
 
-    input  [7:0] cmp [7:0], // cmp[i][j] := a[i] <= a[j]
-    output reg [2:0] result [7:0]
-);
+    input  wire [7:0] cmp0,
+    input  wire [7:0] cmp1,
+    input  wire [7:0] cmp2,
+    input  wire [7:0] cmp3,
+    input  wire [7:0] cmp4,
+    input  wire [7:0] cmp5,
+    input  wire [7:0] cmp6,
+    input  wire [7:0] cmp7,
+    // cmpi[j] := a[i] <= a[j]
+
+    output reg  [2:0] result0,
+    output reg  [2:0] result1,
+    output reg  [2:0] result2,
+    output reg  [2:0] result3,
+    output reg  [2:0] result4,
+    output reg  [2:0] result5,
+    output reg  [2:0] result6,
+    output reg  [2:0] result7
+); 
     // start must be a one cycle pulse 
     parameter S_IDLE = 3'd0, 
         S_BI1 = 3'd1, 
@@ -21,52 +37,112 @@ module BitonicSortingNetwork (
     reg [2:0]next_state;
     reg do_bi1; reg do_bi2; reg do_bi4; reg do_reset;
     reg do_bi2_mg2; reg do_bi4_mg4; reg do_bi4_mg2;
+    
+
+    function [2:0] get_result;
+        input [2:0] idx;
+        begin
+            case (idx)
+                3'd0: get_result = result0;
+                3'd1: get_result = result1;
+                3'd2: get_result = result2;
+                3'd3: get_result = result3;
+                3'd4: get_result = result4;
+                3'd5: get_result = result5;
+                3'd6: get_result = result6;
+                default: get_result = result7;
+            endcase
+        end
+    endfunction
+
+    function get_cmp_bit;
+        input [2:0] row;
+        input [2:0] col;
+        reg [7:0] row_bits;
+        begin
+            case (row)
+                3'd0: row_bits = cmp0;
+                3'd1: row_bits = cmp1;
+                3'd2: row_bits = cmp2;
+                3'd3: row_bits = cmp3;
+                3'd4: row_bits = cmp4;
+                3'd5: row_bits = cmp5;
+                3'd6: row_bits = cmp6;
+                default: row_bits = cmp7;
+            endcase
+
+            case (col)
+                3'd0: get_cmp_bit = row_bits[0];
+                3'd1: get_cmp_bit = row_bits[1];
+                3'd2: get_cmp_bit = row_bits[2];
+                3'd3: get_cmp_bit = row_bits[3];
+                3'd4: get_cmp_bit = row_bits[4];
+                3'd5: get_cmp_bit = row_bits[5];
+                3'd6: get_cmp_bit = row_bits[6];
+                default: get_cmp_bit = row_bits[7];
+            endcase
+        end
+    endfunction
 
     // ----------------------------- State Register -----------------------------
     integer i;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            state <= S_IDLE; 
-            for (i = 0; i < 8; i++) result[i] <= i[2:0];
+            state   <= S_IDLE;
+            result0 <= 3'd0;
+            result1 <= 3'd1;
+            result2 <= 3'd2;
+            result3 <= 3'd3;
+            result4 <= 3'd4;
+            result5 <= 3'd5;
+            result6 <= 3'd6;
+            result7 <= 3'd7;
         end else begin
             if (do_reset) begin
-                for (i = 0; i < 8; i++) result[i] <= i[2:0];            
+                result0 <= 3'd0;
+                result1 <= 3'd1;
+                result2 <= 3'd2;
+                result3 <= 3'd3;
+                result4 <= 3'd4;
+                result5 <= 3'd5;
+                result6 <= 3'd6;
+                result7 <= 3'd7;
             end
             if (do_bi1) begin 
-                {result[1], result[0]} <= (cmp[result[0]][result[1]]) ? {result[1], result[0]} : {result[0], result[1]};
-                {result[3], result[2]} <= (cmp[result[3]][result[2]]) ? {result[3], result[2]} : {result[2], result[3]};
-                {result[5], result[4]} <= (cmp[result[4]][result[5]]) ? {result[5], result[4]} : {result[4], result[5]};
-                {result[7], result[6]} <= (cmp[result[7]][result[6]]) ? {result[7], result[6]} : {result[6], result[7]};
+                {result[1], result[0]} <= (get_cmp_bit(get_result(3'd0), get_result(3'd1))) ? {result[1], result[0]} : {result[0], result[1]};
+                {result[3], result[2]} <= (get_cmp_bit(get_result(3'd3), get_result(3'd2))) ? {result[3], result[2]} : {result[2], result[3]};
+                {result[5], result[4]} <= (get_cmp_bit(get_result(3'd4), get_result(3'd5))) ? {result[5], result[4]} : {result[4], result[5]};
+                {result[7], result[6]} <= (get_cmp_bit(get_result(3'd7), get_result(3'd6))) ? {result[7], result[6]} : {result[6], result[7]};
             end
             if (do_bi2) begin
-                {result[2], result[0]} <= (cmp[result[0]][result[2]]) ? {result[2], result[0]} : {result[0], result[2]};
-                {result[3], result[1]} <= (cmp[result[1]][result[3]]) ? {result[3], result[1]} : {result[1], result[3]};
-                {result[6], result[4]} <= (cmp[result[6]][result[4]]) ? {result[6], result[4]} : {result[4], result[6]};
-                {result[7], result[5]} <= (cmp[result[7]][result[5]]) ? {result[7], result[5]} : {result[5], result[7]};
+                {result[2], result[0]} <= (get_cmp_bit(get_result(3'd0), get_result(3'd2))) ? {result[2], result[0]} : {result[0], result[2]};
+                {result[3], result[1]} <= (get_cmp_bit(get_result(3'd1), get_result(3'd3))) ? {result[3], result[1]} : {result[1], result[3]};
+                {result[6], result[4]} <= (get_cmp_bit(get_result(3'd6), get_result(3'd4))) ? {result[6], result[4]} : {result[4], result[6]};
+                {result[7], result[5]} <= (get_cmp_bit(get_result(3'd7), get_result(3'd5))) ? {result[7], result[5]} : {result[5], result[7]};
             end 
             if (do_bi2_mg2) begin
-                {result[1], result[0]} <= (cmp[result[0]][result[1]]) ? {result[1], result[0]} : {result[0], result[1]};
-                {result[3], result[2]} <= (cmp[result[2]][result[3]]) ? {result[3], result[2]} : {result[2], result[3]};
-                {result[5], result[4]} <= (cmp[result[5]][result[4]]) ? {result[5], result[4]} : {result[4], result[5]};
-                {result[7], result[6]} <= (cmp[result[7]][result[6]]) ? {result[7], result[6]} : {result[6], result[7]};
+                {result[1], result[0]} <= (get_cmp_bit(get_result(3'd0), get_result(3'd1))) ? {result[1], result[0]} : {result[0], result[1]};
+                {result[3], result[2]} <= (get_cmp_bit(get_result(3'd2), get_result(3'd3))) ? {result[3], result[2]} : {result[2], result[3]};
+                {result[5], result[4]} <= (get_cmp_bit(get_result(3'd5), get_result(3'd4))) ? {result[5], result[4]} : {result[4], result[5]};
+                {result[7], result[6]} <= (get_cmp_bit(get_result(3'd7), get_result(3'd6))) ? {result[7], result[6]} : {result[6], result[7]};
             end
             if (do_bi4) begin
-                {result[4], result[0]} <= (cmp[result[0]][result[4]]) ? {result[4], result[0]} : {result[0], result[4]};
-                {result[5], result[1]} <= (cmp[result[1]][result[5]]) ? {result[5], result[1]} : {result[1], result[5]};
-                {result[6], result[2]} <= (cmp[result[2]][result[6]]) ? {result[6], result[2]} : {result[2], result[6]};
-                {result[7], result[3]} <= (cmp[result[3]][result[7]]) ? {result[7], result[3]} : {result[3], result[7]};
+                {result[4], result[0]} <= (get_cmp_bit(get_result(3'd0), get_result(3'd4))) ? {result[4], result[0]} : {result[0], result[4]};
+                {result[5], result[1]} <= (get_cmp_bit(get_result(3'd1), get_result(3'd5))) ? {result[5], result[1]} : {result[1], result[5]};
+                {result[6], result[2]} <= (get_cmp_bit(get_result(3'd2), get_result(3'd6))) ? {result[6], result[2]} : {result[2], result[6]};
+                {result[7], result[3]} <= (get_cmp_bit(get_result(3'd3), get_result(3'd7))) ? {result[7], result[3]} : {result[3], result[7]};
             end 
             if (do_bi4_mg4) begin
-                {result[2], result[0]} <= (cmp[result[0]][result[2]]) ? {result[2], result[0]} : {result[0], result[2]};
-                {result[3], result[1]} <= (cmp[result[1]][result[3]]) ? {result[3], result[1]} : {result[1], result[3]};
-                {result[6], result[4]} <= (cmp[result[4]][result[6]]) ? {result[6], result[4]} : {result[4], result[6]};
-                {result[7], result[5]} <= (cmp[result[5]][result[7]]) ? {result[7], result[5]} : {result[5], result[7]};
+                {result[2], result[0]} <= (get_cmp_bit(get_result(3'd0), get_result(3'd2))) ? {result[2], result[0]} : {result[0], result[2]};
+                {result[3], result[1]} <= (get_cmp_bit(get_result(3'd1), get_result(3'd3))) ? {result[3], result[1]} : {result[1], result[3]};
+                {result[6], result[4]} <= (get_cmp_bit(get_result(3'd4), get_result(3'd6))) ? {result[6], result[4]} : {result[4], result[6]};
+                {result[7], result[5]} <= (get_cmp_bit(get_result(3'd5), get_result(3'd7))) ? {result[7], result[5]} : {result[5], result[7]};
             end 
             if (do_bi4_mg2) begin
-                {result[1], result[0]} <= (cmp[result[0]][result[1]]) ? {result[1], result[0]} : {result[0], result[1]};
-                {result[3], result[2]} <= (cmp[result[2]][result[3]]) ? {result[3], result[2]} : {result[2], result[3]};
-                {result[5], result[4]} <= (cmp[result[4]][result[5]]) ? {result[5], result[4]} : {result[4], result[5]};
-                {result[7], result[6]} <= (cmp[result[6]][result[7]]) ? {result[7], result[6]} : {result[6], result[7]};
+                {result[1], result[0]} <= (get_cmp_bit(get_result(3'd0), get_result(3'd1))) ? {result[1], result[0]} : {result[0], result[1]};
+                {result[3], result[2]} <= (get_cmp_bit(get_result(3'd2), get_result(3'd3))) ? {result[3], result[2]} : {result[2], result[3]};
+                {result[5], result[4]} <= (get_cmp_bit(get_result(3'd4), get_result(3'd5))) ? {result[5], result[4]} : {result[4], result[5]};
+                {result[7], result[6]} <= (get_cmp_bit(get_result(3'd6), get_result(3'd7))) ? {result[7], result[6]} : {result[6], result[7]};
             end
             state <= next_state;
         end
@@ -166,16 +242,61 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
         .result(cross_result)
     );
 
-    reg [7:0]sorter_cmp[7:0]; reg [2:0]sorter_result[7:0];
-    reg sorter_rst_n; reg sorter_start; wire sorter_busy; wire sorter_done; 
+    reg  [7:0] sorter_cmp0, sorter_cmp1, sorter_cmp2, sorter_cmp3;
+    reg  [7:0] sorter_cmp4, sorter_cmp5, sorter_cmp6, sorter_cmp7;
+
+    wire [2:0] sorter_result0, sorter_result1, sorter_result2, sorter_result3;
+    wire [2:0] sorter_result4, sorter_result5, sorter_result6, sorter_result7;
+
+    reg  sorter_rst_n;
+    reg  sorter_start;
+    wire sorter_busy;
+    wire sorter_done;
+
     BitonicSortingNetwork _sorter(
-        .clk(clk), .rst_n(sorter_rst_n), .start(sorter_start), 
-        .busy(sorter_busy), .done(sorter_done),
-        .cmp(sorter_cmp), .result(sorter_result)
+        .clk(clk),
+        .rst_n(sorter_rst_n),
+        .start(sorter_start),
+        .busy(sorter_busy),
+        .done(sorter_done),
+
+        .cmp0(sorter_cmp0),
+        .cmp1(sorter_cmp1),
+        .cmp2(sorter_cmp2),
+        .cmp3(sorter_cmp3),
+        .cmp4(sorter_cmp4),
+        .cmp5(sorter_cmp5),
+        .cmp6(sorter_cmp6),
+        .cmp7(sorter_cmp7),
+
+        .result0(sorter_result0),
+        .result1(sorter_result1),
+        .result2(sorter_result2),
+        .result3(sorter_result3),
+        .result4(sorter_result4),
+        .result5(sorter_result5),
+        .result6(sorter_result6),
+        .result7(sorter_result7)
     );
     
     reg sign;
 
+    function [2:0] get_sorter_result;
+        input [2:0] idx;
+        begin
+            case (idx)
+                3'd0: get_sorter_result = sorter_result0;
+                3'd1: get_sorter_result = sorter_result1;
+                3'd2: get_sorter_result = sorter_result2;
+                3'd3: get_sorter_result = sorter_result3;
+                3'd4: get_sorter_result = sorter_result4;
+                3'd5: get_sorter_result = sorter_result5;
+                3'd6: get_sorter_result = sorter_result6;
+                default: get_sorter_result = sorter_result7;
+            endcase
+        end
+    endfunction
+    
     function [127:0] state_name;
         input reg[3:0] s;
         begin
@@ -198,30 +319,49 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
         end
     endfunction
 
+    task set_sorter_cmp_bit;
+        input [2:0] row;
+        input [2:0] col;
+        input       val;
+        begin
+            case (row)
+                3'd0: sorter_cmp0[col] <= val;
+                3'd1: sorter_cmp1[col] <= val;
+                3'd2: sorter_cmp2[col] <= val;
+                3'd3: sorter_cmp3[col] <= val;
+                3'd4: sorter_cmp4[col] <= val;
+                3'd5: sorter_cmp5[col] <= val;
+                3'd6: sorter_cmp6[col] <= val;
+                3'd7: sorter_cmp7[col] <= val;
+            endcase
+        end
+    endtask
+
+    integer t;
     // ----------------------------- State Register -----------------------------
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            sorter_cmp[0] <= 8'b11111111;
-            sorter_cmp[1] <= 8'b11111110;
-            sorter_cmp[2] <= 8'b11111100;
-            sorter_cmp[3] <= 8'b11111000;
-            sorter_cmp[4] <= 8'b11110000;
-            sorter_cmp[5] <= 8'b11100000;
-            sorter_cmp[6] <= 8'b11000000;
-            sorter_cmp[7] <= 8'b10000000;
+            sorter_cmp0 <= 8'b11111111;
+            sorter_cmp1 <= 8'b11111110;
+            sorter_cmp2 <= 8'b11111100;
+            sorter_cmp3 <= 8'b11111000;
+            sorter_cmp4 <= 8'b11110000;
+            sorter_cmp5 <= 8'b11100000;
+            sorter_cmp6 <= 8'b11000000;
+            sorter_cmp7 <= 8'b10000000;
             valid <= 0;
             is_inside <= 0;
             state <= S_READ_TARGET;
         end else begin
             if (state == S_IDLE) begin
-                sorter_cmp[0] <= 8'b11111111;
-                sorter_cmp[1] <= 8'b11111110;
-                sorter_cmp[2] <= 8'b11111100;
-                sorter_cmp[3] <= 8'b11111000;
-                sorter_cmp[4] <= 8'b11110000;
-                sorter_cmp[5] <= 8'b11100000;
-                sorter_cmp[6] <= 8'b11000000;
-                sorter_cmp[7] <= 8'b10000000;
+                sorter_cmp0 <= 8'b11111111;
+                sorter_cmp1 <= 8'b11111110;
+                sorter_cmp2 <= 8'b11111100;
+                sorter_cmp3 <= 8'b11111000;
+                sorter_cmp4 <= 8'b11110000;
+                sorter_cmp5 <= 8'b11100000;
+                sorter_cmp6 <= 8'b11000000;
+                sorter_cmp7 <= 8'b10000000;
                 valid <= 0;
             end else if (state == S_READ_TARGET) begin
                 target_x <= X;
@@ -257,16 +397,25 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 $display("  CROSS input: A=(%0d,%0d), B=(%0d,%0d)",
                     vec1_x, vec1_y, vec2_x, vec2_y);
             end else if (state == S_HARVEST_CROSS) begin
-                sorter_cmp[i][j] <= (cross_result > 0);
-                sorter_cmp[j][i] <= ~(cross_result > 0);
+                set_sorter_cmp_bit(i, j, (cross_result > 0));
+                set_sorter_cmp_bit(j, i, ~(cross_result > 0));
                 i <= j == 3'd5 ? i + 3'd1 : i;
                 j <= j == 3'd5 ? i + 3'd2 : j + 1;
                 $display("  CROSS[%0d][%0d] = %0d (sign=%0d)",
                     i, j, cross_result, (cross_result > 0));
             end else if (state == S_START_SORTER) begin
                 $display("  SORTER START");
-                for (int t = 0; t < 8; t = t + 1) begin
-                    $display("lane %0d : cmp = %b", t, sorter_cmp[t]);
+                for (t = 0; t < 8; t = t + 1) begin
+                    case (t)
+                        0: $display("lane %0d : cmp = %b", t, sorter_cmp0);
+                        1: $display("lane %0d : cmp = %b", t, sorter_cmp1);
+                        2: $display("lane %0d : cmp = %b", t, sorter_cmp2);
+                        3: $display("lane %0d : cmp = %b", t, sorter_cmp3);
+                        4: $display("lane %0d : cmp = %b", t, sorter_cmp4);
+                        5: $display("lane %0d : cmp = %b", t, sorter_cmp5);
+                        6: $display("lane %0d : cmp = %b", t, sorter_cmp6);
+                        7: $display("lane %0d : cmp = %b", t, sorter_cmp7);
+                    endcase
                 end
             end else if (state == S_WAIT_SORT) begin 
                 $display("  SORTER busy=%0d done=%0d", sorter_busy, sorter_done);
@@ -277,18 +426,18 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 vec2_y <= target_vector_y[sorter_result[0]];
                 $display("  SORT RESULT ORDER:");
                 $display("    %0d %0d %0d %0d %0d %0d",
-                    sorter_result[0], sorter_result[1], sorter_result[2],
-                    sorter_result[3], sorter_result[4], sorter_result[5]);
+                    sorter_result0, sorter_result1, sorter_result2,
+                    sorter_result3, sorter_result4, sorter_result5);
             end else if (state == S_JUDGE_INIT2) begin
                 sign <= (cross_result > 0);
                 k <= 0;
                 is_inside <= (cross_result != 0);
                 $display("  INIT sign(next)=%0d (cross=%0d)", (cross_result > 0), cross_result);
             end else if (state == S_JUDGE_INSIDE_CALC) begin
-                vec1_x <= target_vector_x[sorter_result[k]];
-                vec1_y <= target_vector_y[sorter_result[k]];
-                vec2_x <= target_vector_x[sorter_result[k + 1]];
-                vec2_y <= target_vector_y[sorter_result[k + 1]];
+                vec1_x <= target_vector_x[get_sorter_result(k)];
+                vec1_y <= target_vector_y[get_sorter_result(k)];
+                vec2_x <= target_vector_x[get_sorter_result(k + 3'd1)];
+                vec2_y <= target_vector_y[get_sorter_result(k + 3'd1)];
                 $display("  EDGE k=%0d: A=(%0d,%0d) B=(%0d,%0d)",
                     k,
                     target_vector_x[sorter_result[k]],
