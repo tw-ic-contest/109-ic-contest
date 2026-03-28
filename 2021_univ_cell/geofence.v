@@ -197,26 +197,26 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             sorter_cmp[0] <= 8'b11111111;
-            sorter_cmp[1] <= 8'b01111111;
-            sorter_cmp[2] <= 8'b00111111;
-            sorter_cmp[3] <= 8'b00011111;
-            sorter_cmp[4] <= 8'b00001111;
-            sorter_cmp[5] <= 8'b00000111;
-            sorter_cmp[6] <= 8'b00000011;
-            sorter_cmp[7] <= 8'b00000001;
+            sorter_cmp[1] <= 8'b11111110;
+            sorter_cmp[2] <= 8'b11111100;
+            sorter_cmp[3] <= 8'b11111000;
+            sorter_cmp[4] <= 8'b11110000;
+            sorter_cmp[5] <= 8'b11100000;
+            sorter_cmp[6] <= 8'b11000000;
+            sorter_cmp[7] <= 8'b10000000;
             valid <= 0;
             is_inside <= 0;
             state <= S_READ_TARGET;
         end else begin
             if (state == S_IDLE) begin
                 sorter_cmp[0] <= 8'b11111111;
-                sorter_cmp[1] <= 8'b01111111;
-                sorter_cmp[2] <= 8'b00111111;
-                sorter_cmp[3] <= 8'b00011111;
-                sorter_cmp[4] <= 8'b00001111;
-                sorter_cmp[5] <= 8'b00000111;
-                sorter_cmp[6] <= 8'b00000011;
-                sorter_cmp[7] <= 8'b00000001;
+                sorter_cmp[1] <= 8'b11111110;
+                sorter_cmp[2] <= 8'b11111100;
+                sorter_cmp[3] <= 8'b11111000;
+                sorter_cmp[4] <= 8'b11110000;
+                sorter_cmp[5] <= 8'b11100000;
+                sorter_cmp[6] <= 8'b11000000;
+                sorter_cmp[7] <= 8'b10000000;
                 valid <= 0;
             end else if (state == S_READ_TARGET) begin
                 target_x <= X;
