@@ -113,11 +113,13 @@ module BitonicSortingNetwork (
 endmodule
 
 module Cross (
-    input wire signed [10:0]vec1[1:0], // {vx1, vy1}
-    input wire signed [10:0]vec2[1:0], // {vx2, vy2}
-    output wire signed [22:0]result
+    input  signed [10:0] vec1_x,
+    input  signed [10:0] vec1_y,
+    input  signed [10:0] vec2_x,
+    input  signed [10:0] vec2_y,
+    output signed [22:0] result
 );
-    assign result = vec1[0] * vec2[1] - vec1[1] * vec2[0];
+    assign result = vec1_x * vec2_y - vec1_y * vec2_x;
 endmodule
 
 module geofence ( clk,reset,X,Y,valid,is_inside);
@@ -153,10 +155,16 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
     reg signed [10:0]vertex_vector_x[5:1]; reg signed [10:0]vertex_vector_y[5:1]; // P0Pi
     reg signed [10:0]target_vector_x[5:0]; reg signed [10:0]target_vector_y[5:0]; // PPi
 
-    reg signed [10:0]vec1[1:0];
-    reg signed [10:0]vec2[1:0];
-    reg signed [22:0]cross_result;
-    Cross _cross(.vec1(vec1), .vec2(vec2), .result(cross_result));
+    reg  signed [10:0] vec1_x, vec1_y;
+    reg  signed [10:0] vec2_x, vec2_y;
+    wire signed [22:0] cross_result;
+    Cross _cross(
+        .vec1_x(vec1_x),
+        .vec1_y(vec1_y),
+        .vec2_x(vec2_x),
+        .vec2_y(vec2_y),
+        .result(cross_result)
+    );
 
     reg [7:0]sorter_cmp[7:0]; reg [2:0]sorter_result[7:0];
     reg sorter_rst_n; reg sorter_start; wire sorter_busy; wire sorter_done; 
