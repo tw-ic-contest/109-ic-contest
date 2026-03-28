@@ -169,7 +169,7 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
     reg sign;
 
     function [127:0] state_name;
-        input wire[3:0] s;
+        input reg[3:0] s;
         begin
             case (s)
                 S_IDLE: state_name = "S_IDLE";
