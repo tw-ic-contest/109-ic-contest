@@ -16,7 +16,8 @@ module BitonicSortingNetwork (
         S_BI2_MG2, 
         S_BI4, 
         S_BI4_MG4, 
-        S_BI4_MG2
+        S_BI4_MG2, 
+        S_BI8
     } state_t;
     state_t state, next_state;
     reg do_bi1; reg do_bi2; reg do_bi4; reg do_reset;
@@ -83,7 +84,8 @@ module BitonicSortingNetwork (
             S_BI2_MG2   : next_state = S_BI4;
             S_BI4       : next_state = S_BI4_MG4;
             S_BI4_MG4   : next_state = S_BI4_MG2;
-            S_BI4_MG2   : next_state = S_IDLE;
+            S_BI4_MG2   : next_state = S_BI8;
+            S_BI8       : next_state = S_IDLE;
         endcase
     end
 
@@ -273,7 +275,7 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                 sign <= (cross_result > 0);
                 k <= 0;
                 is_inside <= (cross_result != 0);
-                $display("  INIT sign=%0d (cross=%0d)", sign, cross_result);
+                $display("  INIT sign(next)=%0d (cross=%0d)", (cross_result > 0), cross_result);
             end else if (state == S_JUDGE_INSIDE_CALC) begin
                 vec1[0] <= target_vector_x[sorter_result[k]];
                 vec1[1] <= target_vector_y[sorter_result[k]];
