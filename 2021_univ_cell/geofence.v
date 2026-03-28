@@ -260,6 +260,12 @@ module geofence ( clk,reset,X,Y,valid,is_inside);
                     i, j, cross_result, (cross_result > 0));
             end else if (state == S_START_SORTER) begin
                 $display("  SORTER START");
+                if (state == SORTER_START) begin
+                    $display("===== SORTER CMP DEBUG =====");
+                    for (int t = 0; t < 8; t = t + 1) begin
+                        $display("lane %0d : cmp = %b", t, sorter_cmp[t]);
+                    end
+                end
             end else if (state == S_WAIT_SORT) begin 
                 $display("  SORTER busy=%0d done=%0d", sorter_busy, sorter_done);
             end else if (state == S_JUDGE_INIT1) begin
