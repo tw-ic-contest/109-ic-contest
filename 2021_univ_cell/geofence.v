@@ -62,10 +62,13 @@ module geofence (
     // ---------------- Sequential Logic ----------------
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            state <= S_IDLE;
+            state <= S_READ;    
             valid <= 0;
-            is_inside <= 0;
+            is_inside <= 1;     // 預設為 true
             count <= 0;
+            // 記得在此初始化 index，否則第一組測資排序會爛掉
+            idx[1] <= 1; idx[2] <= 2; idx[3] <= 3; 
+            idx[4] <= 4; idx[5] <= 5;
         end else begin
             case (state)
                 S_IDLE: begin
